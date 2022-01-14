@@ -1,6 +1,6 @@
 {
   "name": "hachiware_routing",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Client(SPA) And Framework Routing.",
   "main": "index.js",
   "scripts": {
