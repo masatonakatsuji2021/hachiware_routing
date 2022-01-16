@@ -242,10 +242,25 @@ module.exports = function(mode, routings){
         else{
             response.mode = "error";
             response = convertMode(getErrorRouting(targetUrl), response);
-            response.aregment = {
-                exception: "page not found",
-            };       
+            response.aregment = {};
+            response.exception = new Error("Page not found.");
         }
+    
+        return response;
+    };
+
+    this.getError = function(targetUrl){
+
+        var routes = getErrorRouting(targetUrl);
+
+        var response = {
+            base: targetUrl,
+            query : null,
+        };
+    
+        response.mode = "error";
+        response = convertMode(routes, response);
+        response.aregment = {};
     
         return response;
     };
