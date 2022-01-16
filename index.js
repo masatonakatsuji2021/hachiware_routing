@@ -1,4 +1,4 @@
-module.exports = function(mode, targetUrl, routings){
+module.exports = function(mode, routings){
 
     const convertRoutings = function(params){
 
@@ -64,17 +64,20 @@ module.exports = function(mode, targetUrl, routings){
         return result;
     };
 
-    const convertGetQuery = function(targetUrl){
+    const getQuery = function(targetUrl){
 
         var queryStr = targetUrl.split("?");
 
         if(!queryStr[1]){
-            return queryStr[0];
+            return {
+                url: queryStr[0],
+                query: null,
+            };
         }
 
         var queryBuff = queryStr[1].split("&");
 
-        query = {};
+        var query = {};
 
         for(var n = 0 ; n < queryBuff.length ; n++){
             var sect = queryBuff[n].split("=");
@@ -82,7 +85,10 @@ module.exports = function(mode, targetUrl, routings){
             query[sect[0]] = sect[1];
         }
 
-        return queryStr[0];
+        return {
+            url: queryStr[0],
+            query: query,
+        };
     };
 
     const convertMode = function(target, result){
@@ -99,137 +105,149 @@ module.exports = function(mode, targetUrl, routings){
         return result;
     };
 
-    var query = null;
-
-    if(!targetUrl){
-        targetUrl = "/";
-    }
-
-    if(targetUrl.substring(0,1) != "/"){
-        targetUrl = "/" + targetUrl;
-    }
-
-    targetUrl = convertGetQuery(targetUrl);
-
     var routingBuffer = convertRoutings(routings.release);
 
-    var colums = Object.keys(routingBuffer);
+    /**
+     * get
+     * @param {*} targetUrl 
+     * @returns 
+     */
+    this.get = function(targetUrl){
+
+        var query = null;
+
+        if(!targetUrl){
+            targetUrl = "/";
+        }
     
-    var checkList = {};
-    var aregments = {};
-    for(var n = 0 ; n < colums.length ; n++){
-        var url = colums[n];
-
-        aregments[url] = {};
-
-        var urls = url.split("/");
-        if(!urls[urls.length - 1]){
-            urls.pop();
+        if(targetUrl.substring(0,1) != "/"){
+            targetUrl = "/" + targetUrl;
         }
+     
+        var buff = getQuery(targetUrl);
 
-        var targetUrls = targetUrl.split("/");
-        if(!targetUrls[targetUrls.length - 1]){
-            targetUrls.pop();
-        }
+        targetUrl = buff.url;
+        query = buff.query;
 
-        checkList[url] = [];
-
-        for(var n2 = 0 ; n2 < urls.length ; n2++){
-            var urld1 = urls[n2];
-            var urld2 = targetUrls[n2];
-
-            if(urld1 == urld2){
-                checkList[url].push(1);
+        var colums = Object.keys(routingBuffer);
+    
+        var checkList = {};
+        var aregments = {};
+        for(var n = 0 ; n < colums.length ; n++){
+            var url = colums[n];
+    
+            aregments[url] = {};
+    
+            var urls = url.split("/");
+            if(!urls[urls.length - 1]){
+                urls.pop();
             }
-            else{
-                if(
-                    urld1.indexOf("{:") > -1 && 
-                    urld1.indexOf("}") > -1
-                ){
-                    if(urld2){
-                        var argKey = urld1.split("{:").join("").
-                            split("}").join("").
-                            split("?").join("")
-                        ;
-
-                        if(argKey){
-                            aregments[url][argKey] = targetUrls[n2];
-                        }
-                        else{
-                            if(!Object.keys(aregments[url]).length){
-                                aregments[url] = [];
+    
+            var targetUrls = targetUrl.split("/");
+            if(!targetUrls[targetUrls.length - 1]){
+                targetUrls.pop();
+            }
+    
+            checkList[url] = [];
+    
+            for(var n2 = 0 ; n2 < urls.length ; n2++){
+                var urld1 = urls[n2];
+                var urld2 = targetUrls[n2];
+    
+                if(urld1 == urld2){
+                    checkList[url].push(1);
+                }
+                else{
+                    if(
+                        urld1.indexOf("{:") > -1 && 
+                        urld1.indexOf("}") > -1
+                    ){
+                        if(urld2){
+                            var argKey = urld1.split("{:").join("").
+                                split("}").join("").
+                                split("?").join("")
+                            ;
+    
+                            if(argKey){
+                                aregments[url][argKey] = targetUrls[n2];
                             }
-                            aregments[url].push(targetUrls[n2]);
-                        }
-                        checkList[url].push(1);
-                    }
-                    else{
-                        if(
-                            urld1.indexOf("{:") > -1 && 
-                            urld1.indexOf("}") > -1 && 
-                            urld1.indexOf("?") > -1
-                        ){
-                            targetUrls[n2] = "??";
+                            else{
+                                if(!Object.keys(aregments[url]).length){
+                                    aregments[url] = [];
+                                }
+                                aregments[url].push(targetUrls[n2]);
+                            }
                             checkList[url].push(1);
                         }
                         else{
-                            checkList[url].push(0);
-                        }    
+                            if(
+                                urld1.indexOf("{:") > -1 && 
+                                urld1.indexOf("}") > -1 && 
+                                urld1.indexOf("?") > -1
+                            ){
+                                targetUrls[n2] = "??";
+                                checkList[url].push(1);
+                            }
+                            else{
+                                checkList[url].push(0);
+                            }    
+                        }
                     }
+                    else{
+                        checkList[url].push(0);
+                    }    
                 }
-                else{
-                    checkList[url].push(0);
-                }    
+            }
+    
+            if(urls.length == targetUrls.length){
+                checkList[url].push(1);
+            }
+            else{
+                checkList[url].push(0);
             }
         }
-
-        if(urls.length == targetUrls.length){
-            checkList[url].push(1);
+    
+        var desitionUrl = null;
+        var colums = Object.keys(checkList);
+    
+        for(var n = 0 ; n < colums.length ; n++){
+            var url = colums[n];
+            var value = checkList[url];
+    
+            var juge = true;
+            for(var n2 = 0 ; n2 < value.length ; n2++){
+                var v_ = value[n2];
+    
+                if(!v_){
+                    juge = false;
+                    break;
+                }
+            }
+    
+            if(juge){
+                desitionUrl = url;
+            }
+        }
+    
+        var response = {
+            base: targetUrl,
+            query : query,
+        };
+    
+        if(desitionUrl){
+            response.mode = "success";
+            response = convertMode(routingBuffer[desitionUrl], response);
+            response.aregment = aregments[desitionUrl];
         }
         else{
-            checkList[url].push(0);
+            response.mode = "error";
+            response = convertMode(getErrorRouting(targetUrl), response);
+            response.aregment = {
+                exception: "page not found",
+            };       
         }
-    }
-
-    var desitionUrl = null;
-    var colums = Object.keys(checkList);
-
-    for(var n = 0 ; n < colums.length ; n++){
-        var url = colums[n];
-        var value = checkList[url];
-
-        var juge = true;
-        for(var n2 = 0 ; n2 < value.length ; n2++){
-            var v_ = value[n2];
-
-            if(!v_){
-                juge = false;
-                break;
-            }
-        }
-
-        if(juge){
-            desitionUrl = url;
-        }
-    }
-
-    var response = {
-        base: targetUrl,
-        query : query,
+    
+        return response;
     };
 
-    if(desitionUrl){
-        response.mode = "success";
-        response = convertMode(routingBuffer[desitionUrl], response);
-        response.aregment = aregments[desitionUrl];
-    }
-    else{
-        response.mode = "error";
-        response = convertMode(getErrorRouting(targetUrl), response);
-        response.aregment = {
-            exception: "page not found",
-        };       
-    }
-
-    return response;    
 };
