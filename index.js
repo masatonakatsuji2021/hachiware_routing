@@ -1,3 +1,20 @@
+/**
+ * ====================================================================
+ * Hachiware_routing
+ * 
+ * Client(SPA) And Framework Routing.
+ * 
+ * License : MIT License. 
+ * Since   : 2022.01.15
+ * Author  : Nakatsuji Masato 
+ * Email   : nakatsuji@teastalk.jp
+ * HP URL  : https://hachiware-js.com/
+ * GitHub  : https://github.com/masatonakatsuji2021/Hachiware_routing
+ * npm     : https://www.npmjs.com/package/Hachiware_routing
+ * 
+ * ====================================================================
+ */
+
 module.exports = function(mode, routings){
 
     const convertRoutings = function(params){
