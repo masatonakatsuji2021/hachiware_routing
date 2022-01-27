@@ -57,6 +57,10 @@ module.exports = function(mode, routings){
 
         var result = null;
 
+        if(!routings.error){
+            return result;
+        }
+
         var colums = Object.keys(routings.error);
         for(var n = 0 ; n < colums.length ; n++){
             var url = colums[n];
@@ -114,9 +118,11 @@ module.exports = function(mode, routings){
             result.page = target;
         }
         else if(mode == "server"){
-            var buff = target.split("@");
-            result.controller = buff[0];
-            result.action = buff[1];
+            if(target){
+                var buff = target.split("@");
+                result.controller = buff[0];
+                result.action = buff[1];
+            }
         }
 
         return result;
