@@ -129,6 +129,7 @@ module.exports = function(mode, routings){
     };
 
     var routingBuffer = convertRoutings(routings.release);
+    var rouitngBufferSocket = convertRoutings(routings.socket);
 
     /**
      * get
@@ -272,6 +273,46 @@ module.exports = function(mode, routings){
         return response;
     };
 
+    /**
+     * getSocket
+     * @param {*} targetUrl 
+     * @returns 
+     */
+    this.getSocket = function(targetUrl){
+
+        var colums = Object.keys(rouitngBufferSocket);
+
+        var desitionRoutes = null;
+
+        for(var n = 0 ; n < colums.length ; n++){
+            var url = colums[n];
+            var value = rouitngBufferSocket[url];
+
+            if(targetUrl === url){
+                desitionRoutes = value;
+                break;
+            }
+        }
+
+        if(!desitionRoutes){
+            return null;
+        }
+
+        var buff = desitionRoutes.split("@");
+
+        desitionRoutes = {
+            socket: buff[0],
+            action: buff[1],
+        };
+
+        return desitionRoutes;
+    };
+
+    /**
+     * getError
+     * @param {*} targetUrl 
+     * @returns 
+     */
     this.getError = function(targetUrl){
 
         var routes = getErrorRouting(targetUrl);
