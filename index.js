@@ -129,7 +129,9 @@ module.exports = function(mode, routings){
     };
 
     var routingBuffer = convertRoutings(routings.release);
-    var rouitngBufferSocket = convertRoutings(routings.socket);
+    if(mode == "server"){
+        var rouitngBufferSocket = convertRoutings(routings.socket);
+    }
 
     /**
      * get
