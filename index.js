@@ -130,7 +130,10 @@ module.exports = function(mode, routings){
 
     var routingBuffer = convertRoutings(routings.release);
     if(mode == "server"){
-        var rouitngBufferSocket = convertRoutings(routings.socket);
+        var rouitngBufferSocket;
+        if(routings.socket){
+            rouitngBufferSocket = convertRoutings(routings.socket);
+        }
     }
 
     /**
