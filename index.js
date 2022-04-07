@@ -137,7 +137,7 @@ module.exports = function(mode, routings){
 
         var routingBufferConsole;
         if(routings.console){
-            routingBufferConsole = convertRouting(routings.console);
+            routingBufferConsole = convertRoutings(routings.console);
         }
     }
 
@@ -354,7 +354,7 @@ module.exports = function(mode, routings){
         var buff = desitionRoutes.split("@");
     
         desitionRoutes = {
-            socket: buff[0],
+            shell: buff[0],
             action: buff[1],
         };
     
