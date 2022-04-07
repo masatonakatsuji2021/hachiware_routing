@@ -134,6 +134,11 @@ module.exports = function(mode, routings){
         if(routings.socket){
             rouitngBufferSocket = convertRoutings(routings.socket);
         }
+
+        var routingBufferConsole;
+        if(routings.console){
+            routingBufferConsole = convertRouting(routings.console);
+        }
     }
 
     /**
@@ -285,6 +290,10 @@ module.exports = function(mode, routings){
      */
     this.getSocket = function(targetUrl){
 
+        if(!rouitngBufferSocket){
+            return null;
+        }
+
         var colums = Object.keys(rouitngBufferSocket);
 
         var desitionRoutes = null;
@@ -312,6 +321,46 @@ module.exports = function(mode, routings){
 
         return desitionRoutes;
     };
+
+    /**
+     * getConsole
+     * @param {*} command 
+     * @returns 
+     */
+    this.getConsole = function(command){
+
+        if(!routingBufferConsole){
+            return null;
+        }
+        
+        var colums = Object.keys(routingBufferConsole);
+    
+        var desitionRoutes = null;
+    
+        for(var n = 0 ; n < colums.length ; n++){
+            var url = colums[n];
+            var value = routingBufferConsole[url];
+    
+            if(command === url){
+                desitionRoutes = value;
+                break;
+            }
+        }
+    
+        if(!desitionRoutes){
+            return null;
+        }
+    
+        var buff = desitionRoutes.split("@");
+    
+        desitionRoutes = {
+            socket: buff[0],
+            action: buff[1],
+        };
+    
+        return desitionRoutes;
+    };
+    
 
     /**
      * getError
