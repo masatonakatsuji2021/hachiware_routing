@@ -361,7 +361,6 @@ module.exports = function(mode, routings){
         return desitionRoutes;
     };
     
-
     /**
      * getError
      * @param {*} targetUrl 
