@@ -115,7 +115,14 @@ module.exports = function(mode, routings){
     const convertMode = function(target, result){
 
         if(mode == "client"){
-            result.page = target;
+            if(target.indexOf("@") > -1){
+                var targets = target.split("@");
+                result.controller = targets[0];
+                result.action = targets[1];
+            }
+            else{
+                result.page = target;
+            }
         }
         else if(mode == "server"){
             if(target){
